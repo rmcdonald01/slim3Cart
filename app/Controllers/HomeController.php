@@ -14,9 +14,10 @@ class HomeController
 {
     public function index(Request $request, Response $response, Twig $view, Product $product )
     {
-      $product = $product->get();
-      var_dump($product);
-      die;
-      return $view->render($response, 'home.twig');
+      $products = $product->get();
+
+      return $view->render($response, 'home.twig', [
+        'products'  => $products,
+      ]);
     }
 }
