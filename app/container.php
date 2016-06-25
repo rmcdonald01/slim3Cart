@@ -1,9 +1,10 @@
 <?php
 
+use function DI\get;
 use Slim\Views\Twig;
+use Cart\Models\Product;
 use Slim\Views\TwigExtension;
 use Interop\Container\ContainerInterface;
-use function DI\get;
 
 return [
   'router' => get(Slim\Router::class),
@@ -19,6 +20,10 @@ return [
         ));
 
         return $twig;
+  },
+  Product::class => function (ContainerInterface $c)
+  {
+    return new Product;
   }
 
 ];
