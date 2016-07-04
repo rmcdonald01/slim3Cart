@@ -7,6 +7,7 @@ use Slim\Views\Twig;
 use Cart\Basket\Basket;
 use Cart\Models\Product;
 use Psr\Http\Message\ResponseInterface as Response;
+use Cart\Basket\Exceptions\QuantityExceededException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
@@ -26,6 +27,8 @@ class CartController
 
   public function index(Request $request, Response $response, Twig $view)
   {
+    $this->basket->refresh();
+
     return $view->render($response, 'cart/index.twig');
   }
 
@@ -49,6 +52,24 @@ class CartController
 
     return $response->withRedirect($router->pathFor('cart.index'));
 
+  }
+
+  public function update($slug, Request $request, Response $response, Router $router)
+  {
+    $product = $this->product->where('slug', $slug)->first();
+    
+    if (!$product) {
+      return $response->withRedirect($router->pathFor('home'));
+    }
+
+    try {
+      $this->basket->update($product, $request->getParam('quantity'));
+
+    } catch (QuantityExceededException $e) {
+      //
+    }
+
+    return $response->withRedirect($router->pathFor('cart.index'));
   }
 
   public function test($slug, $quantity, Request $request, Response $reponse, Router $router)
